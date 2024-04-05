@@ -10,15 +10,33 @@ mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp').
 
 app.set ('view engine', 'ejs');
 app.set ('views', path.join(__dirname, 'views'));
+app.use (express.urlencoded({extended: true}))
 
 app.get('/', (req, res)=>{
     res.render ('home')
 })
 
-app.get('/makecampgroud', async (req, res)=>{
-    const camp = new Campgroud({title:'My backyard', description: 'Free camping'})
-    await camp.save();
-    res.send (camp)
+app.get('/campgrouds', async (req, res)=>{
+    const campgrouds = await Campgroud.find({});
+    res.render('campgrouds/index', {campgrouds})
+  
+})
+
+app.get('/campgrouds/new', (req, res)=>{
+    res.render('campgrouds/new')
+})
+
+app.post('/campgrouds', async (req, res)=>{
+    const campgroud = new Campgroud(req.body.campgroud);
+    await campgroud.save();
+    res.redirect (`/campgrouds/${campgroud._id}`)
+
+})
+
+app.get('/campgrouds/:id', async (req, res)=>{
+    const campgrouds = await Campgroud.findById(req.params.id);
+    res.render('campgrouds/show', {campgrouds})
+  
 })
 
 app.listen(3000, () =>{

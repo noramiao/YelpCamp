@@ -24,3 +24,13 @@ const seedDB = async () =>{
 seedDB().then(() => {
     mongoose.connection.close();
 })
+
+// explaination:randon100 is a variable (in this case a number from 0 to 1000), to get the vaule from a array of object, use array[index].property (cities[random1000].city)
+
+//the function to get a random value out of array:
+//function (array) => {array[Math.floor(Math.random()*array.length)]} 
+
+
+// sample is a function. this function is used to get a random value from a array (descriptor or/and places in this case). So when we call the function sample() and pass in the parameter (descriptor or places), we get a function that take a random value from array of descriptor and/or places.
+
+// If rewrite using only the sample function: location: ${sample(cities).city},${sample(cities).state}
