@@ -3,29 +3,44 @@
         <h1 class="text-center">Edit Campground</h1>
         <div class="col-6 offset-3">
              <!-- As the form only can be post or get request, use method-override to 'fake a PUT request' -->
-            <form action="/campgrouds/<%=campgrouds._id%>?_method=PUT", method ="POST">
+            <form action="/campgrouds/<%=campgrouds._id%>?_method=PUT", method ="POST" novalidate class="validated-form">
                 <div class="mb-3">
                     <label class="form-lable" for="title">Title</label>
-                    <input class="form-control", id = "title", name ="campgroud[title]", value="<%=campgrouds.title %>">
+                    <input class="form-control", id = "title", name ="campgroud[title]", value="<%=campgrouds.title %>" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                      </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-lable" for="location">Location</label>
-                    <input class="form-control" type="text", id = "location", name ="campgroud[location]", value="<%=campgrouds.location %>">
+                    <input class="form-control" type="text", id = "location", name ="campgroud[location]", value="<%=campgrouds.location %>" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                      </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-lable" for="image">Image Url</label>
-                    <input class="form-control" type="text", id = "image", name ="campgroud[image]", value="<%=campgrouds.image %>">
+                    <input class="form-control" type="text", id = "image", name ="campgroud[image]", value="<%=campgrouds.image %>" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                      </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-lable" for="price">Campground Price</label>
                     <div class="input-group mb-3">
                         <span class="input-group-text" id="price-label">$</span>
-                        <input type="number" class="form-control" placeholder="0.00", name ="campgroud[price]", aria-label="price" aria-describedby="price-label", value="<%=campgrouds.price %>">
+                        <input type="number" class="form-control" placeholder="0.00", name ="campgroud[price]", aria-label="price" aria-describedby="price-label", value="<%=campgrouds.price %>" required>
+                        <div class="valid-feedback">
+                            Looks good!
+                          </div>
                     </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-lable" for="textarea">Description</label>
-                    <textarea class="form-control" type="text", id = "textarea", name ="campgroud[description]"><%=campgrouds.description%></textarea>
+                    <textarea class="form-control" type="text", id = "textarea", name ="campgroud[description]" required><%=campgrouds.description%></textarea>
+                    <div class="valid-feedback">
+                        Looks good!
+                      </div>
                 </div>
                 <div class="mb-3">
                 <button class="btn btn-info">Update Campground</button>
