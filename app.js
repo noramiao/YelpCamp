@@ -8,6 +8,7 @@ const catchAsync = require ('./utils/catchAsync');
 const ExpressError = require('./utils/ExpressError');
 const methodOverride = require('method-override');
 const Campgroud = require ('./models/campground');
+const Review = require ('./models/review');
 
 // connect to mongodb and handle the connection error.
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp').
@@ -85,6 +86,17 @@ app.delete('/campgrouds/:id', catchAsync(async(req, res) =>{
     const {id} = req.params;
     await Campgroud.findByIdAndDelete(id);
     res.redirect('/campgrouds');
+}))
+
+app.post('/campgrouds/:id/reviews', catchAsync(async(req, res) => {
+    const {id} = req.params;
+    const campgroud = await Campgroud.findById(id);
+    const review = new Review(req.body.review);
+    campgroud.reviews.push(review);
+    await review.save();
+    await campgroud.save();
+    res.redirect(`/campgrouds/${campgroud._id}`);
+
 }))
 
 app.all ('*', (req, res, next) =>{
