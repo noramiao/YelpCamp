@@ -109,6 +109,13 @@ app.post('/campgrouds/:id/reviews', validateReview, catchAsync(async(req, res) =
 
 }))
 
+app.delete('/campgrouds/:id/reviews/:reviewId', catchAsync(async(req, res) =>{
+    const {id, reviewId} = req.params;
+    const campgroud = await Campgroud.findByIdAndUpdate(id, {$pull: {reviews: reviewId}});
+    const review = await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/campgrouds/${campgroud._id}`);
+}))
+
 app.all ('*', (req, res, next) =>{
     // next(new ExpressError('Page Not Found', 404)
     next(new ExpressError)
