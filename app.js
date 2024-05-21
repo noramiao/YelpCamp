@@ -3,7 +3,7 @@ const app = express ();
 const path = require ('path');
 const mongoose = require('mongoose');
 const ejsMate = require ('ejs-mate');
-const {campgroudSchema} = require ('./schemas');
+const {campgroudSchema, reviewSchema} = require ('./schemas');
 const catchAsync = require ('./utils/catchAsync');
 const ExpressError = require('./utils/ExpressError');
 const methodOverride = require('method-override');
@@ -38,6 +38,16 @@ const validateCampgroud = (req, res, next) =>{
     }
 }
 
+const validateReview = (req, res, next) =>{
+    const {error} = reviewSchema.validate(req.body);
+    if(error){
+        const msg = error.details.map(el =>el.message).join(',')
+        throw new ExpressError(msg, 400)
+    }else{
+        next();
+    }
+}
+
 app.get('/', (req, res)=>{
     res.render ('home')
 })
@@ -62,7 +72,7 @@ app.post('/campgrouds', validateCampgroud, catchAsync(async (req, res)=>{
 }))
 
 app.get('/campgrouds/:id', catchAsync(async (req, res)=>{
-    const campgrouds = await Campgroud.findById(req.params.id);
+    const campgrouds = await Campgroud.findById(req.params.id).populate('reviews');
     res.render('campgrouds/show', {campgrouds})
   
 }))
@@ -88,7 +98,7 @@ app.delete('/campgrouds/:id', catchAsync(async(req, res) =>{
     res.redirect('/campgrouds');
 }))
 
-app.post('/campgrouds/:id/reviews', catchAsync(async(req, res) => {
+app.post('/campgrouds/:id/reviews', validateReview, catchAsync(async(req, res) => {
     const {id} = req.params;
     const campgroud = await Campgroud.findById(id);
     const review = new Review(req.body.review);
