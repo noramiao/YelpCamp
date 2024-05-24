@@ -4,11 +4,12 @@ const path = require ('path');
 const mongoose = require('mongoose');
 const ejsMate = require ('ejs-mate');
 const {campgroudSchema, reviewSchema} = require ('./schemas');
-const catchAsync = require ('./utils/catchAsync');
+const session = require('express-session');
+const flash = require('connect-flash');
 const ExpressError = require('./utils/ExpressError');
 const methodOverride = require('method-override');
-const Campgroud = require ('./models/campground');
-const Review = require ('./models/review');
+const campgrouds = require('./routes/campgrounds');
+const reviews = require('./routes/reviews');
 
 // connect to mongodb and handle the connection error.
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp').
@@ -18,103 +19,38 @@ app.set ('view engine', 'ejs');
 app.set ('views', path.join(__dirname, 'views'));
 
 app.engine ('ejs', ejsMate)
-app.use (express.urlencoded({extended: true}))
+app.use (express.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
+app.use(express.static(path.join(__dirname, 'public')))
 
-const validateCampgroud = (req, res, next) =>{
-    // Step 1: define the validation schema: https://joi.dev/api/?v=17.13.0
-    
-    // const result =camgroudSchema.validate(req.body);
-    // console.log(result);
-    // console.log(result.error);
-
-    // Step 2: passthrough data to validate
-    const {error} = campgroudSchema.validate(req.body);
-    if(error){
-        const msg = error.details.map(el =>el.message).join(',')
-        throw new ExpressError(msg, 400)
-    }else{
-        next();
+const sessionConfig = {
+    secret: 'thisisatopsecret.',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 60 * 60 * 24 * 7
     }
 }
 
-const validateReview = (req, res, next) =>{
-    const {error} = reviewSchema.validate(req.body);
-    if(error){
-        const msg = error.details.map(el =>el.message).join(',')
-        throw new ExpressError(msg, 400)
-    }else{
-        next();
-    }
-}
+app.use(session (sessionConfig));
+app.use(flash());
+
+app.use((req, res, next)=>{
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next()
+})
+
+app.use('/campgrouds', campgrouds);
+app.use('/campgrouds/:id/reviews', reviews)
 
 app.get('/', (req, res)=>{
     res.render ('home')
 })
 
-app.get('/campgrouds', catchAsync(async (req, res)=>{
-    const campgrouds = await Campgroud.find({});
-    res.render('campgrouds/index', {campgrouds})
-  
-}))
 
-app.get('/campgrouds/new', (req, res)=>{
-    res.render('campgrouds/new')
-})
-
-app.post('/campgrouds', validateCampgroud, catchAsync(async (req, res)=>{
-
-    
-    const campgroud = new Campgroud(req.body.campgroud);
-    await campgroud.save();
-    res.redirect (`/campgrouds/${campgroud._id}`)
-
-}))
-
-app.get('/campgrouds/:id', catchAsync(async (req, res)=>{
-    const campgrouds = await Campgroud.findById(req.params.id).populate('reviews');
-    res.render('campgrouds/show', {campgrouds})
-  
-}))
-
-//EDIT function need 2 steps, one create get request and render a edit form. 
-//Two, create a put request and render the edit form, redirect to a new page
-//Step1:
-app.get('/campgrouds/:id/edit', catchAsync(async (req, res)=>{
-    const campgrouds = await Campgroud.findById(req.params.id);
-    res.render('campgrouds/edit', {campgrouds})
-  
-}))
-//Step 2:Update the value with a PUT request and then redirect to a new page
-app.put('/campgrouds/:id/', validateCampgroud, catchAsync(async (req, res) =>{
-    const {id} = req.params;
-    const campgrouds = await Campgroud.findByIdAndUpdate (id, {...req.body.campgroud});
-    res.redirect(`/campgrouds/${campgrouds._id}`)
-}))
-
-app.delete('/campgrouds/:id', catchAsync(async(req, res) =>{
-    const {id} = req.params;
-    await Campgroud.findByIdAndDelete(id);
-    res.redirect('/campgrouds');
-}))
-
-app.post('/campgrouds/:id/reviews', validateReview, catchAsync(async(req, res) => {
-    const {id} = req.params;
-    const campgroud = await Campgroud.findById(id);
-    const review = new Review(req.body.review);
-    campgroud.reviews.push(review);
-    await review.save();
-    await campgroud.save();
-    res.redirect(`/campgrouds/${campgroud._id}`);
-
-}))
-
-app.delete('/campgrouds/:id/reviews/:reviewId', catchAsync(async(req, res) =>{
-    const {id, reviewId} = req.params;
-    const campgroud = await Campgroud.findByIdAndUpdate(id, {$pull: {reviews: reviewId}});
-    const review = await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/campgrouds/${campgroud._id}`);
-}))
 
 app.all ('*', (req, res, next) =>{
     // next(new ExpressError('Page Not Found', 404)
