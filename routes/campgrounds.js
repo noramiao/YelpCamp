@@ -6,22 +6,17 @@ const {isLoggedIn, validateCampgroud, isAuthor} = require('../middleware');
 
 const Campgroud = require ('../models/campground');
 
-
-router.get('/', catchAsync(campgrounds.index));
+router.route('/')
+    .get( catchAsync(campgrounds.index))
+    .post( isLoggedIn, validateCampgroud, catchAsync(campgrounds.createCampground));
 
 router.get('/new', isLoggedIn, campgrounds.renderNewForm);
 
-router.post('/', isLoggedIn, validateCampgroud, catchAsync(campgrounds.createCampground));
+router.route ('/:id')
+    .get(catchAsync(campgrounds.showCampground))
+    .put( isLoggedIn, isAuthor, validateCampgroud, catchAsync(campgrounds.updateCampground))
+    .delete(isLoggedIn, isAuthor, catchAsync(campgrounds.deleteCampground));
 
-router.get('/:id', catchAsync(campgrounds.showCampground));
-
-//EDIT function need 2 steps, one create get request and render a edit form. 
-//Two, create a put request and render the edit form, redirect to a new page
-//Step1:
 router.get('/:id/edit', isLoggedIn, isAuthor, catchAsync(campgrounds.renderEditForm));
-//Step 2:Update the value with a PUT request and then redirect to a new page
-router.put('/:id/', isLoggedIn, isAuthor, validateCampgroud, catchAsync(campgrounds.updateCampground));
-
-router.delete('/:id', isLoggedIn, isAuthor, catchAsync(campgrounds.deleteCampground))
 
 module.exports = router; 

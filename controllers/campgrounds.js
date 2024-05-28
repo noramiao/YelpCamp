@@ -33,7 +33,9 @@ module.exports.showCampground = async (req, res)=>{
     res.render('campgrouds/show', {campgrouds})
   
 };
-
+//EDIT function need 2 steps, one create get request and render a edit form. 
+//Two, create a put request and render the edit form, redirect to a new page
+//Step1:
 module.exports.renderEditForm = async (req, res)=>{
     const campgrouds = await Campgroud.findById(req.params.id);
     if(!campgrouds){
@@ -48,7 +50,7 @@ module.exports.renderEditForm = async (req, res)=>{
     // }
     res.render('campgrouds/edit', {campgrouds})
 };
-
+//Step 2:Update the value with a PUT request and then redirect to a new page
 module.exports.updateCampground = async (req, res) =>{
     const {id} = req.params;
     // to protect the edit routes, add logic we find the campground at first, then check if the author is the same as the currentUser. if yes, allow editing. using a middleware called isAuthor. 
