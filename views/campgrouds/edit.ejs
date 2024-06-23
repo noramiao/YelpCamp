@@ -3,7 +3,7 @@
         <h1 class="text-center">Edit Campground</h1>
         <div class="col-6 offset-3">
              <!-- As the form only can be post or get request, use method-override to 'fake a PUT request' -->
-            <form action="/campgrouds/<%=campgrouds._id%>?_method=PUT", method ="POST" novalidate class="validated-form">
+            <form action="/campgrouds/<%=campgrouds._id%>?_method=PUT", method ="POST" novalidate class="validated-form" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label class="form-lable" for="title">Title</label>
                     <input class="form-control", id = "title", name ="campgroud[title]", value="<%=campgrouds.title %>" required>
@@ -18,13 +18,12 @@
                         Looks good!
                       </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-lable" for="image">Image Url</label>
-                    <input class="form-control" type="text", id = "image", name ="campgroud[image]", value="<%=campgrouds.image %>" required>
-                    <div class="valid-feedback">
-                        Looks good!
-                      </div>
-                </div>
+                <!-- Uploading new campgrounds images -->
+             <div class="mb-3">
+                <label for="image" class="form-label">Add more images</label>
+                <input class="form-control" type="file" name="image" id="image" multiple>
+            </div>
+               
                 <div class="mb-3">
                     <label class="form-lable" for="price">Campground Price</label>
                     <div class="input-group mb-3">
@@ -42,6 +41,17 @@
                         Looks good!
                       </div>
                 </div>
+
+                <div class="mb-3">
+                    <% campgrouds.images.forEach(function(img,i){ %>
+                    <img src="<%=img.url%>"  class="img-thumbnail" alt="">
+                    <div class="form-check-inline">
+                        <input type="checkbox" id="image-<%=i%>" name="deleteImages[]" value="<%=img.filename%>">
+                    </div>
+                    <label for="image-<%=i%>">Delete image</label>
+                    <% }) %>
+                </div>
+
                 <div class="mb-3">
                 <button class="btn btn-info">Update Campground</button>
                 </div>

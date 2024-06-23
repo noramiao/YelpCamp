@@ -2,7 +2,7 @@
 <div class="row">
     <h1 class="text-center">New Campground</h1>
     <div class="col-6 offset-3">
-        <form action="/campgrouds", method ="POST" novalidate class="validated-form">
+        <form action="/campgrouds", method ="POST" novalidate class="validated-form" enctype="multipart/form-data">
             <div class="mb-3">
                 <label class="form-lable" for="title">Title</label>
                 <input class="form-control", id = "title", name ="campgroud[title]" required>
@@ -10,6 +10,7 @@
                     Looks good!
                   </div>
             </div>
+          
             <div class="mb-3">
                 <label class="form-lable" for="location">Location</label>
                 <input class="form-control" type="text", id = "location", name ="campgroud[location]" required>
@@ -17,13 +18,14 @@
                     Looks good!
                   </div>
             </div>
-            <div class="mb-3">
-                <label class="form-lable" for="image">Image Url</label>
-                <input class="form-control" type="text", id = "image", name ="campgroud[image]" required>
-                <div class="valid-feedback">
-                    Looks good!
-                  </div>
+
+             <!-- Uploading new campgrounds images -->
+             <div class="mb-3">
+                <label for="image" class="form-label">Uploading Images</label>
+                <input class="form-control" type="file" name="image" id="image" multiple>
             </div>
+
+           
             <div class="input-group mb-3">
                 <label class="form-lable" for="price">Campground Price</label>
                 <div class="input-group mb-3">
@@ -34,6 +36,7 @@
                       </div>
                 </div>
             </div>
+
             <div class="mb-3">
                 <label class="form-lable" for="textarea">Description</label>
                 <textarea class="form-control" type="text", id = "textarea", name ="campgroud[description]" required> </textarea>
@@ -41,6 +44,9 @@
                     Looks good!
                   </div>
             </div>
+
+           
+
             <div class="mb-3">
             <button class="btn btn-success">Add New Campground</button>
             </div>

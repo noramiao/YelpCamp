@@ -11,8 +11,10 @@ module.exports.renderNewForm = (req, res)=>{
 
 module.exports.createCampground = async (req, res)=>{
     const campgroud = new Campgroud(req.body.campgroud);
+    campgroud.images = req.files.map(f => ({url: f.path, filename: f.filename}));
     campgroud.author = req.user._id;
     await campgroud.save();
+    console.log(campgroud);
     req.flash('success','Successfully made a new campground!');
     res.redirect (`/campgrouds/${campgroud._id}`)
 
@@ -53,9 +55,12 @@ module.exports.renderEditForm = async (req, res)=>{
 //Step 2:Update the value with a PUT request and then redirect to a new page
 module.exports.updateCampground = async (req, res) =>{
     const {id} = req.params;
+    console.log(req.body);
     // to protect the edit routes, add logic we find the campground at first, then check if the author is the same as the currentUser. if yes, allow editing. using a middleware called isAuthor. 
-   
     const campgrouds = await Campgroud.findByIdAndUpdate (id, {...req.body.campgroud});
+    const imgs = req.files.map(f => ({url: f.path, filename: f.filename}));
+    campgrouds.images.push(...imgs);
+    await campgrouds.save();
     req.flash('success','Successfully updated a campground!');
     res.redirect(`/campgrouds/${campgrouds._id}`)
 }
